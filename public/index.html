@@ -1,11 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bright Salon</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Bright Salon</title>
+  <link rel="stylesheet" href="/css/index/style.css">
+  <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-    <h1>Bright Salon</h1>
+  <header>
+    <nav class="nav-bar container">
+      <img class="logo black-cover-white-hover nav-bar-selection" src="/image/d8a3645d-eaa3-4658-8cac-00c68655f786 (1).png" alt="Logo">
+      
+      <ul class="menu" id="main-menu">
+        <li class="black-cover-white-hover nav-bar-selection">
+          <a href="/" class="menu-item">Trang chủ</a>
+        </li>
+        <li class="black-cover-white-hover nav-bar-selection">
+          <a href="/dich-vu" class="menu-item">Dịch vụ</a>
+        </li>
+        <li class="black-cover-white-hover nav-bar-selection">
+          <a href="/chi-nhanh-salon" class="menu-item">Tìm Salon gần nhất</a>
+        </li>
+        <li class="black-cover-white-hover nav-bar-selection">
+          <a href="/dat-lich" class="menu-item">Đặt lịch</a>
+        </li>
+      </ul>
+
+      <div class="auth">
+        <div id="auth-logged-in" class="inactive">
+          <span class="user-name" id="user-name-display">Xin chào, </span>
+          <button type="button" class="logout-btn black-cover-white-hover nav-bar-selection">Đăng xuất</button>
+        </div>
+
+        <div id="auth-guest">
+          <button type="button" class="login-btn reseted-btn black-cover-white-hover nav-bar-selection">Đăng nhập</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+  </main>
+
+  <footer>
+    <div class="footer-content container">
+      <p>&copy; 2026 Bright. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/nav_bar.js" defer></script>
 </body>
+
 </html>

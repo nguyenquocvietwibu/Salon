@@ -94,6 +94,19 @@ const model = {
         const sql = `SELECT * FROM dich_vu WHERE loai = 'Gói' ORDER BY ten ASC`;
         const ketQua = await query(sql);
         return ketQua.rows;
+    },
+    timTheoTen: async (ten_tim_kiem) => {
+        // Biến đổi từ khóa về chữ thường ngay trên Node.js
+        const tuKhoa = `%${ten_tim_kiem.toLowerCase()}%`;
+        
+        const sql = `
+            SELECT * FROM dich_vu
+            WHERE LOWER(ten) LIKE $1 AND dang_hoat_dong = true
+            ORDER BY ma ASC;
+        `;
+        
+        const ketQua = await query(sql, [tuKhoa]);
+        return ketQua.rows;
     }
 }
 module.exports = {

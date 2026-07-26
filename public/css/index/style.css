@@ -1,0 +1,100 @@
+header {
+    border: solid 3px red;
+}
+main {
+     border: solid 3px blue;
+}
+footer {
+    border: solid 3px green;
+}
+
+.nav-bar {
+    display: flex;               /* Biến nav-bar thành một hộp Flexbox hàng ngang */
+    justify-content: space-between; /* THẦN CHÚ: Đẩy .logo sang trái cùng, .auth sang phải cùng, .menu ở giữa */
+    align-items: center;         /* Căn giữa tất cả các phần tử theo chiều dọc */
+    height: 60px;
+    gap: 30px;
+}
+
+.menu {
+    display: flex;     /* Biến hộp menu thành flex để kích hoạt tính năng giãn cách */
+    gap: 30px;
+    height: 100%;
+}
+
+/* Thêm dòng này vào CSS định dạng thẻ a của bạn */
+.menu-item {
+    color: inherit; /* Tự động lấy màu của li bọc nó, li màu gì a màu đấy */
+    text-decoration: none;
+    display: flex;          /* Biến chính thẻ A thành flex để căn giữa chữ */
+    align-items: center;    /* Căn giữa chữ theo chiều dọc bên trong thẻ A */
+    width: 100%;            /* Phình to hết chiều ngang của LI */
+    height: 100%;           /* Phình to hết chiều cao của LI */
+}
+
+.menu li {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: larger;
+}
+
+.black-cover-white-hover:hover {
+    background-color: black;
+    color: white;
+}
+
+/* 1. ĐẶT Ở ĐÂY: Trạng thái bình thường */
+.black-cover-white-hover {
+    transition: background-color 0.4s ease, color 0.2s ease;
+}
+
+
+.login-btn {
+    height: 100%;
+    align-items: center;
+    display: flex;
+    font-size: larger;
+}
+
+.reseted-btn {
+    border: none;
+    background: none;
+}
+
+.auth {
+    display: flex;     /* Biến hộp menu thành flex để kích hoạt tính năng giãn cách */
+    gap: 30px;
+    height: 100%;
+}
+/* 2. Ép thằng khổng lồ logo phải tuân lệnh chiều cao này */
+.logo {
+    height: 100%; /* Cho cái hộp chứa logo cao bằng 100% của nav-bar (tức là 60px) */
+    cursor: pointer;
+}
+
+.nav-bar-selection {
+    padding: 0 10px;
+    border-radius: 5px;
+}
+
+.footer-content {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: black;
+}
+
+#main-content {
+    height: 1000px;
+    padding: 20px 0;
+}
+
+/* 🎯 KHI ĐƯỢC CHỌN: Tự động ăn màu đen kể cả khi không hover chuột vào */
+.black-cover-white-hover.selected {
+    background-color: black;
+    color: white;
+}
