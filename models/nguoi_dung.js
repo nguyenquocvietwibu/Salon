@@ -73,7 +73,17 @@ const model = {
         const ketQua = await query(sql, [tuKhoa]);
         return ketQua.rows;
     },
-
+    
+    layTheoSDT: async (sdt) => {
+        const sql = `
+            SELECT nd.*, vt.ten AS ten_vai_tro
+            FROM nguoi_dung nd
+            LEFT JOIN vai_tro vt ON nd.ma_vai_tro = vt.ma
+            WHERE nd.sdt = $1
+        `;
+        const ketQua = await query(sql, [sdt]);
+        return ketQua.rows[0];
+    },
     // 2. Tìm kiếm NHÂN VIÊN theo tên (Tìm trong các vai trò chứa chữ "Nhân viên")
     timNhanVienTheoTen: async (ten_tim_kiem) => {
         const tuKhoa = `%${ten_tim_kiem.toLowerCase()}%`;

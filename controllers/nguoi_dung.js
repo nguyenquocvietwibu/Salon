@@ -1,5 +1,6 @@
 const { model: nguoiDungModel } = require('../models/nguoi_dung');
 const { model: nhanVienModel } = require('../models/nhan_vien');
+const danhSachOTP = {};
 
 const controller = {
     // 1. Lấy tất cả người dùng hệ thống (Đã chuẩn hóa JSON trả về)
@@ -42,7 +43,55 @@ const controller = {
             res.status(500).json({ success: false, error: err.message });
         }
     },
+    getByPhone: async (req, res) => {
+        try {
+            const { sdt } = req.query;
 
+            if (!sdt) {
+                return res.status(400).json({ success: false, message: "Thiếu số điện thoại!" });
+            }
+
+            const user = await nguoiDungModel.layTheoSDT(sdt);
+
+            if (!user) {
+                return res.status(404).json({ success: false, message: "Không tìm thấy người dùng!" });
+            }
+
+            res.status(200).json({ success: true, data: user });
+        } catch (err) {
+            res.status(500).json({ success: false, error: err.message });
+        }
+    },
+    login: async (req, res) => {
+        try {
+            const { sdt, otp } = req.body;
+            if (!sdt) return res.status(400).json({ success: false, message: "Thiếu SĐT!" });
+
+            // Chưa có OTP -> Tạo và gửi OTP mới
+            if (!otp) {
+                const user = await nguoiDungModel.layTheoSDT(sdt);
+                if (!user) return res.status(404).json({ success: false, message: "Không tìm thấy SĐT!" });
+                
+                const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+                danhSachOTP[sdt] = { otp: otpCode, hetHan: Date.now() + 120000 };
+                
+                console.log(`[OTP ${sdt}]: ${otpCode}`);
+                return res.status(200).json({ success: true, message: "Đã gửi OTP!" });
+            }
+
+            // Đã có OTP -> Kiểm tra xác thực
+            const record = danhSachOTP[sdt];
+            if (!record || Date.now() > record.hetHan || record.otp !== otp) {
+                return res.status(400).json({ success: false, message: "OTP sai hoặc hết hạn!" });
+            }
+
+            delete danhSachOTP[sdt];
+            const user = await nguoiDungModel.layTheoSDT(sdt);
+            res.status(200).json({ success: true, data: user });
+        } catch (err) {
+            res.status(500).json({ success: false, error: err.message });
+        }
+    },
     // 2. Tạo nhân viên mới (Bao gồm insert bảng nguoi_dung và nhan_vien)
     addStaff: async (req, res) => {
         try {
