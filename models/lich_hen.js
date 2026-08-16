@@ -25,9 +25,9 @@ const model = {
         `;
         // Mặc định khi khách đặt lịch trên web/app thì trạng thái sẽ là 'Chờ duyệt'
         const trangThaiMacDinh = 'Chờ duyệt';
-        
+
         const ketQua = await query(sql, [
-            thoi_gian_bat_dau, thoi_gian_ket_thuc, sdt_khach, 
+            thoi_gian_bat_dau, thoi_gian_ket_thuc, sdt_khach,
             ten_khach, ma_chi_nhanh, ngay_hen, tong_gia, trangThaiMacDinh
         ]);
         return ketQua.rows[0];
@@ -63,9 +63,36 @@ const model = {
             WHERE ma_chi_nhanh = $1 AND trang_thai = 'Chờ duyệt'
             ORDER BY ngay_hen DESC, thoi_gian_bat_dau DESC;
         `;
-        
+
         const ketQua = await query(sql, [ma_chi_nhanh]);
         return ketQua.rows;
+    },
+    layTheoMa: async (ma) => {
+        const sql = `
+        SELECT 
+            lh.*,
+            cn.ten AS ten_chi_nhanh,
+            nd_lt.ten AS ten_le_tan,
+            (
+                SELECT json_agg(json_build_object('ma', ctnv.ma_nhan_vien, 'ten', nd.ten))
+                FROM chi_tiet_nhan_vien_lich_hen ctnv
+                JOIN nguoi_dung nd ON ctnv.ma_nhan_vien = nd.ma
+                WHERE ctnv.ma_lich_hen = lh.ma
+            ) AS danh_sach_nhan_vien,
+            (
+                SELECT json_agg(dv.*)
+                FROM chi_tiet_dich_vu_lich_hen ctdv
+                JOIN dich_vu dv ON ctdv.ma_dich_vu = dv.ma
+                WHERE ctdv.ma_lich_hen = lh.ma
+            ) AS danh_sach_dich_vu
+        FROM lich_hen lh
+        LEFT JOIN chi_nhanh cn ON lh.ma_chi_nhanh = cn.ma
+        LEFT JOIN nguoi_dung nd_lt ON lh.ma_le_tan_xac_nhan = nd_lt.ma
+        WHERE lh.ma = $1;
+    `;
+
+        const ketQua = await query(sql, [ma]);
+        return ketQua.rows[0];
     }
 }
 

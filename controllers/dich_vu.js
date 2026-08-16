@@ -21,7 +21,7 @@ const controller = {
         try {
             const { ma } = req.params;
             const data = await dichVuModel.lay(ma);
-            
+
             if (!data) {
                 return res.status(404).json({ success: false, message: "Không tìm thấy dịch vụ" });
             }
@@ -40,21 +40,30 @@ const controller = {
         try {
             const { ten, gia, thoiLuong, maVaiTro } = req.body;
 
-            // Thêm dịch vụ vào bảng dich_vu trước
+            // 1. Kiểm tra bắt buộc phải truyền đủ 4 trường, bao gồm cả maVaiTro
+            if (!ten || !gia || !thoiLuong || !maVaiTro) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Vui lòng nhập đầy đủ: tên, giá, thời lượng và mã vai trò thực hiện dịch vụ!"
+                });
+            }
+
+            // 2. Thêm dịch vụ vào bảng dich_vu
             const data = await dichVuModel.them(ten, gia, thoiLuong, "Lẻ");
 
-            // Nếu có gửi kèm maVaiTro thì thêm vào bảng vai trò thực hiện
-            if (maVaiTro) {
-                await vaiTroThucHienDichVuLe.them(data.ma, maVaiTro);
-            }
+            // 3. Thêm vai trò thực hiện dịch vụ lẻ (chắc chắn chạy vì maVaiTro đã được validate)
+            await vaiTroThucHienDichVuLe.them(data.ma, maVaiTro);
 
             res.status(201).json({
                 success: true,
-                message: "Thêm dịch vụ lẻ và vai trò thành công",
+                message: "Thêm dịch vụ lẻ và vai trò thực hiện thành công",
                 data: data
             });
         } catch (err) {
-            res.status(500).json({ success: false, error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
         }
     },
 
@@ -63,33 +72,45 @@ const controller = {
         try {
             const { ten, gia, thoiLuong, cacMaDVLe } = req.body;
 
-            if (cacMaDVLe && cacMaDVLe.length < 2) {
+            // 1. Kiểm tra bắt buộc phải truyền đủ tất cả các trường
+            if (!ten || !gia || !thoiLuong || !cacMaDVLe) {
                 return res.status(400).json({
                     success: false,
-                    message: "Combo phải bao gồm ít nhất 2 dịch vụ lẻ!"
+                    message: "Vui lòng nhập đầy đủ: tên, giá, thời lượng và danh sách dịch vụ lẻ!"
                 });
             }
-            
-            // Thêm gói vào bảng dich_vu trước để lấy cái 'ma'
+
+            // 2. Kiểm tra cacMaDVLe phải là MẢNG và phải có ÍT NHẤT 2 dịch vụ lẻ
+            if (!Array.isArray(cacMaDVLe) || cacMaDVLe.length < 2) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Combo bắt buộc phải là mảng chứa ít nhất 2 mã dịch vụ lẻ!"
+                });
+            }
+
+            // 3. Thêm gói vào bảng dich_vu
             const newCombo = await dichVuModel.them(ten, gia, thoiLuong, "Gói");
 
-            // Thêm mảng các dịch vụ lẻ đi kèm vào bảng trung gian
+            // 4. Thêm mảng các dịch vụ lẻ đi kèm vào bảng trung gian
             await chiTietDichVuGoiModel.them(newCombo.ma, cacMaDVLe);
 
-            res.status(201).json({ 
+            res.status(201).json({
                 success: true,
-                message: "Thêm combo thành công", 
-                data: newCombo 
+                message: "Thêm combo thành công",
+                data: newCombo
             });
         } catch (err) {
-            res.status(500).json({ success: false, error: err.message });
+            res.status(500).json({
+                success: false,
+                error: err.message
+            });
         }
     },
 
     // 5. Lấy danh sách tất cả dịch vụ lẻ
     getAllSingle: async (req, res) => {
         try {
-            const data = await dichVuModel.layTatLe(); 
+            const data = await dichVuModel.layTatLe();
             res.status(200).json({
                 success: true,
                 data: data
@@ -102,7 +123,7 @@ const controller = {
     // 6. Lấy danh sách tất cả dịch vụ gói
     getAllCombo: async (req, res) => {
         try {
-            const data = await dichVuModel.layTatGoi(); 
+            const data = await dichVuModel.layTatGoi();
             res.status(200).json({
                 success: true,
                 data: data
@@ -115,7 +136,7 @@ const controller = {
     // 7. Lấy chi tiết combo (gồm các dịch vụ lẻ bên trong)
     getComboDetails: async (req, res) => {
         try {
-            const { ma } = req.params; 
+            const { ma } = req.params;
             const data = await dichVuModel.layChiTietDvGoi(ma);
 
             if (!data) {
@@ -153,8 +174,8 @@ const controller = {
     // 9. Xóa dịch vụ
     delete: async (req, res) => {
         try {
-            const { ma } = req.params; 
-            const data = await dichVuModel.xoa(ma); 
+            const { ma } = req.params;
+            const data = await dichVuModel.xoa(ma);
 
             if (!data) {
                 return res.status(404).json({ success: false, message: "Không tìm thấy dịch vụ để xóa" });
@@ -194,10 +215,10 @@ const controller = {
                 await vaiTroThucHienDichVuLe.capNhat(ma, maVaiTro);
             }
 
-            res.status(200).json({ 
+            res.status(200).json({
                 success: true,
-                message: "Cập nhật dịch vụ lẻ thành công", 
-                data: updated 
+                message: "Cập nhật dịch vụ lẻ thành công",
+                data: updated
             });
         } catch (err) {
             res.status(500).json({ success: false, error: err.message });
@@ -220,10 +241,10 @@ const controller = {
             const updated = await controller._update(ma, { ten, gia, thoiLuong, dangHoatDong });
             await chiTietDichVuGoiModel.capNhat(ma, cacMaDVLe);
 
-            res.status(200).json({ 
+            res.status(200).json({
                 success: true,
-                message: "Cập nhật gói dịch vụ thành công", 
-                data: updated 
+                message: "Cập nhật gói dịch vụ thành công",
+                data: updated
             });
         } catch (err) {
             res.status(500).json({ success: false, error: err.message });

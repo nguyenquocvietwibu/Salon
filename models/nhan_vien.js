@@ -34,7 +34,27 @@ const model = {
         
         // Trả về dòng sau khi sửa (chứa ma và ma_chi_nhanh mới)
         return ketQua.rows[0];
-    }
+    },
+    layTheoMa: async (ma) => {
+    const sql = `
+        SELECT 
+            nd.ma,
+            nd.ten,
+            nd.sdt,
+            nd.dang_kich_hoat,
+            nd.ma_vai_tro,
+            vt.ten AS ten_vai_tro,
+            nv.ma_chi_nhanh,
+            cn.ten AS ten_chi_nhanh
+        FROM nhan_vien nv
+        JOIN nguoi_dung nd ON nv.ma = nd.ma
+        LEFT JOIN vai_tro vt ON nd.ma_vai_tro = vt.ma
+        LEFT JOIN chi_nhanh cn ON nv.ma_chi_nhanh = cn.ma
+        WHERE nv.ma = $1;
+    `;
+    const ketQua = await query(sql, [ma]);
+    return ketQua.rows[0];
+}
 }
 
 module.exports = {
